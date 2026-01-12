@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - ENT Preparation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            color: #2d3748;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 40px;
+        }
+
+        .greeting {
+            font-size: 32px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #718096;
+        }
+
+        /* Main Action Button */
+        .action-section {
+            margin-bottom: 40px;
+        }
+
+        .start-test-btn {
+            background: linear-gradient(135deg, #7c3aed 0%, #9f7aea 100%);
+            color: white;
+            border: none;
+            padding: 18px 48px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px 0 rgba(124, 58, 237, 0.3);
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .start-test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(124, 58, 237, 0.4);
+        }
+
+        .start-test-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 20px;
+        }
+
+        .card-icon.purple {
+            background: linear-gradient(135deg, #7c3aed 0%, #9f7aea 100%);
+            color: white;
+        }
+
+        .card-icon.blue {
+            background: linear-gradient(135deg, #4299e1 0%, #63b3ed 100%);
+            color: white;
+        }
+
+        .card-icon.green {
+            background: linear-gradient(135deg, #48bb78 0%, #68d391 100%);
+            color: white;
+        }
+
+        .card-icon.orange {
+            background: linear-gradient(135deg, #ed8936 0%, #f6ad55 100%);
+            color: white;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-top: 8px;
+        }
+
+        .card-label {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-top: 4px;
+        }
+
+        /* Predicted Score Block */
+        .score-block {
+            background: linear-gradient(135deg, #7c3aed 0%, #9f7aea 100%);
+            border-radius: 16px;
+            padding: 32px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+        }
+
+        .score-header {
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .score-value {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .score-description {
+            font-size: 16px;
+            opacity: 0.85;
+            line-height: 1.5;
+        }
+
+        .score-progress {
+            margin-top: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .score-progress-bar {
+            background: white;
+            height: 100%;
+            border-radius: 8px;
+            width: 75%;
+            transition: width 0.3s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .greeting {
+                font-size: 24px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .score-value {
+                font-size: 42px;
+            }
+
+            .start-test-btn {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 16px;
+            }
+
+            .header {
+                margin-bottom: 24px;
+            }
+
+            .action-section {
+                margin-bottom: 24px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .score-block {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="greeting">Welcome back, <span id="studentName">Student</span>! 👋</h1>
+            <p class="subtitle">Ready to continue your ENT preparation journey?</p>
+        </div>
+
+        <!-- Main Action -->
+        <div class="action-section">
+            <button class="start-test-btn" onclick="startTest()">Start Test</button>
+        </div>
+
+        <!-- Progress Cards -->
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">📝</div>
+                    <div>
+                        <div class="card-title">Tests Completed</div>
+                        <div class="card-value">24</div>
+                        <div class="card-label">out of 50 planned</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon blue">📊</div>
+                    <div>
+                        <div class="card-title">Average Score</div>
+                        <div class="card-value">82%</div>
+                        <div class="card-label">+5% from last week</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">⏱️</div>
+                    <div>
+                        <div class="card-title">Study Time</div>
+                        <div class="card-value">42h</div>
+                        <div class="card-label">this month</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon orange">🎯</div>
+                    <div>
+                        <div class="card-title">Streak</div>
+                        <div class="card-value">7 days</div>
+                        <div class="card-label">keep it up!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predicted Score Block -->
+        <div class="score-block">
+            <div class="score-header">Predicted ENT Score</div>
+            <div class="score-value">185</div>
+            <div class="score-description">
+                Based on your recent performance and practice tests, you're on track to achieve a strong score. 
+                Continue practicing to reach your target of 200+ points.
+            </div>
+            <div class="score-progress">
+                <div class="score-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get student name from localStorage or use default
+        function getStudentName() {
+            const name = localStorage.getItem('studentName') || 'Student';
+            document.getElementById('studentName').textContent = name;
+        }
+
+        // Start test function
+        function startTest() {
+            // Redirect to test page or trigger test modal
+            alert('Starting test...');
+            // window.location.href = 'test.html';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            getStudentName();
+        });
+    </script>
+</body>
+</html>
+

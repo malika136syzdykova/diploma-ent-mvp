@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENT Exam Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .test-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+        }
+
+        /* Header with Timer */
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e8ecf1;
+        }
+
+        .question-counter {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #7c3aed;
+        }
+
+        .timer-icon {
+            font-size: 24px;
+        }
+
+        .timer.warning {
+            color: #ed8936;
+        }
+
+        .timer.danger {
+            color: #e53e3e;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Question Section */
+        .question-section {
+            margin-bottom: 40px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 500;
+            color: #1a202c;
+            margin-bottom: 32px;
+            line-height: 1.8;
+        }
+
+        /* Answer Options */
+        .answers-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .answer-option {
+            position: relative;
+        }
+
+        .answer-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .answer-option label {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            color: #2d3748;
+        }
+
+        .answer-option label:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .answer-option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, #7c3aed 0%, #9f7aea 100%);
+            color: white;
+            border-color: #7c3aed;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+            transform: translateX(4px);
+        }
+
+        .answer-option label::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e0;
+            border-radius: 50%;
+            margin-right: 16px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .answer-option input[type="radio"]:checked + label::before {
+            border-color: white;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Navigation Buttons */
+        .test-navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e8ecf1;
+        }
+
+        .btn {
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #7c3aed 0%, #9f7aea 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+            margin-left: auto;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn-next:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-finish {
+            background: linear-gradient(135deg, #48bb78 0%, #68d391 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+        }
+
+        .btn-finish:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(72, 187, 120, 0.4);
+        }
+
+        /* Progress Indicator */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7c3aed 0%, #9f7aea 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .test-container {
+                padding: 24px;
+            }
+
+            .test-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .question-text {
+                font-size: 18px;
+            }
+
+            .answer-option label {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+
+            .test-navigation {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .btn-next {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            .test-container {
+                padding: 20px;
+            }
+
+            .question-text {
+                font-size: 16px;
+            }
+
+            .timer {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Header with Timer -->
+        <div class="test-header">
+            <div class="question-counter">
+                Question <span id="questionNumber">1</span> of <span id="totalQuestions">20</span>
+            </div>
+            <div class="timer" id="timer">
+                <span class="timer-icon">⏱️</span>
+                <span id="timerDisplay">60:00</span>
+            </div>
+        </div>
+
+        <!-- Question Section -->
+        <div class="question-section">
+            <div class="question-text" id="questionText">
+                Which of the following is the most common cause of acute otitis media in children?
+            </div>
+
+            <div class="answers-container" id="answersContainer">
+                <div class="answer-option">
+                    <input type="radio" name="answer" id="answer1" value="1">
+                    <label for="answer1">Streptococcus pneumoniae</label>
+                </div>
+                <div class="answer-option">
+                    <input type="radio" name="answer" id="answer2" value="2">
+                    <label for="answer2">Haemophilus influenzae</label>
+                </div>
+                <div class="answer-option">
+                    <input type="radio" name="answer" id="answer3" value="3">
+                    <label for="answer3">Moraxella catarrhalis</label>
+                </div>
+                <div class="answer-option">
+                    <input type="radio" name="answer" id="answer4" value="4">
+                    <label for="answer4">Staphylococcus aureus</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="test-navigation">
+            <button class="btn btn-finish" id="finishBtn" onclick="finishTest()">Finish Test</button>
+            <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()" disabled>Next</button>
+        </div>
+    </div>
+
+    <script>
+        // Test configuration
+        const totalQuestions = 20;
+        const timeLimit = 60 * 60; // 60 minutes in seconds
+        let currentQuestion = 1;
+        let timeRemaining = timeLimit;
+        let timerInterval;
+        let answers = {}; // Store answers: { questionNumber: answerValue }
+
+        // Sample questions for ENT exam
+        const questions = [
+            {
+                text: "Which of the following is the most common cause of acute otitis media in children?",
+                options: [
+                    "Streptococcus pneumoniae",
+                    "Haemophilus influenzae",
+                    "Moraxella catarrhalis",
+                    "Staphylococcus aureus"
+                ]
+            },
+            {
+                text: "What is the most common site of origin for epistaxis?",
+                options: [
+                    "Kiesselbach's plexus",
+                    "Sphenopalatine artery",
+                    "Anterior ethmoidal artery",
+                    "Posterior ethmoidal artery"
+                ]
+            },
+            {
+                text: "Which nerve is most commonly affected in Bell's palsy?",
+                options: [
+                    "Facial nerve (CN VII)",
+                    "Trigeminal nerve (CN V)",
+                    "Vagus nerve (CN X)",
+                    "Glossopharyngeal nerve (CN IX)"
+                ]
+            },
+            {
+                text: "What is the most common benign tumor of the larynx?",
+                options: [
+                    "Vocal cord polyp",
+                    "Laryngeal papilloma",
+                    "Reinke's edema",
+                    "Granuloma"
+                ]
+            },
+            {
+                text: "Which structure separates the middle ear from the inner ear?",
+                options: [
+                    "Oval window",
+                    "Round window",
+                    "Tympanic membrane",
+                    "Eustachian tube"
+                ]
+            },
+            {
+                text: "What is the most common cause of chronic rhinosinusitis?",
+                options: [
+                    "Allergic rhinitis",
+                    "Nasal polyps",
+                    "Bacterial infection",
+                    "Fungal infection"
+                ]
+            },
+            {
+                text: "Which test is used to evaluate hearing loss in infants?",
+                options: [
+                    "Otoacoustic emissions (OAE)",
+                    "Pure tone audiometry",
+                    "Tympanometry",
+                    "Rinne test"
+                ]
+            },
+            {
+                text: "What is the most common type of hearing loss in adults?",
+                options: [
+                    "Sensorineural hearing loss",
+                    "Conductive hearing loss",
+                    "Mixed hearing loss",
+                    "Central hearing loss"
+                ]
+            },
+            {
+                text: "Which condition is characterized by abnormal bone growth in the middle ear?",
+                options: [
+                    "Otosclerosis",
+                    "Cholesteatoma",
+                    "Mastoiditis",
+                    "Tympanosclerosis"
+                ]
+            },
+            {
+                text: "What is the primary function of the Eustachian tube?",
+                options: [
+                    "Equalize pressure between middle ear and atmosphere",
+                    "Drain fluid from the middle ear",
+                    "Transmit sound waves",
+                    "Protect the inner ear"
+                ]
+            },
+            {
+                text: "Which structure is responsible for balance and spatial orientation?",
+                options: [
+                    "Vestibular system",
+                    "Cochlea",
+                    "Semicircular canals",
+                    "Utricle and saccule"
+                ]
+            },
+            {
+                text: "What is the most common cause of sudden sensorineural hearing loss?",
+                options: [
+                    "Idiopathic",
+                    "Viral infection",
+                    "Acoustic trauma",
+                    "Autoimmune disease"
+                ]
+            },
+            {
+                text: "Which type of tonsillectomy is most commonly performed?",
+                options: [
+                    "Cold dissection",
+                    "Electrocautery",
+                    "Coblation",
+                    "Laser"
+                ]
+            },
+            {
+                text: "What is the most common site for laryngeal cancer?",
+                options: [
+                    "Glottis",
+                    "Supraglottis",
+                    "Subglottis",
+                    "Pyriform sinus"
+                ]
+            },
+            {
+                text: "Which nerve provides sensory innervation to the anterior two-thirds of the tongue?",
+                options: [
+                    "Lingual nerve (branch of CN V)",
+                    "Glossopharyngeal nerve (CN IX)",
+                    "Hypoglossal nerve (CN XII)",
+                    "Facial nerve (CN VII)"
+                ]
+            },
+            {
+                text: "What is the most common cause of chronic cough in adults?",
+                options: [
+                    "Postnasal drip",
+                    "Asthma",
+                    "GERD",
+                    "Chronic bronchitis"
+                ]
+            },
+            {
+                text: "Which structure is the primary site of gas exchange in the nasal cavity?",
+                options: [
+                    "Inferior turbinate",
+                    "Middle turbinate",
+                    "Superior turbinate",
+                    "Nasal septum"
+                ]
+            },
+            {
+                text: "What is the most common benign salivary gland tumor?",
+                options: [
+                    "Pleomorphic adenoma",
+                    "Warthin's tumor",
+                    "Oncocytoma",
+                    "Basal cell adenoma"
+                ]
+            },
+            {
+                text: "Which condition is characterized by inflammation of the mastoid air cells?",
+                options: [
+                    "Mastoiditis",
+                    "Otitis media",
+                    "Cholesteatoma",
+                    "Tympanosclerosis"
+                ]
+            },
+            {
+                text: "What is the most common cause of voice hoarseness?",
+                options: [
+                    "Vocal cord nodules",
+                    "Laryngitis",
+                    "Vocal cord polyps",
+                    "Laryngeal cancer"
+                ]
+            }
+        ];
+
+        // Initialize test
+        function initTest() {
+            updateQuestion();
+            startTimer();
+            updateProgress();
+        }
+
+        // Update question display
+        function updateQuestion() {
+            const question = questions[currentQuestion - 1];
+            document.getElementById('questionText').textContent = question.text;
+            document.getElementById('questionNumber').textContent = currentQuestion;
+            document.getElementById('totalQuestions').textContent = totalQuestions;
+
+            const container = document.getElementById('answersContainer');
+            container.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'answer-option';
+                const optionId = `answer${index + 1}`;
+                const isChecked = answers[currentQuestion] === (index + 1).toString();
+
+                optionDiv.innerHTML = `
+                    <input type="radio" name="answer" id="${optionId}" value="${index + 1}" ${isChecked ? 'checked' : ''}>
+                    <label for="${optionId}">${option}</label>
+                `;
+                container.appendChild(optionDiv);
+            });
+
+            // Enable/disable Next button based on selection
+            const radioButtons = document.querySelectorAll('input[name="answer"]');
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.getElementById('nextBtn').disabled = false;
+                    answers[currentQuestion] = this.value;
+                });
+            });
+
+            // Check if answer already exists
+            if (answers[currentQuestion]) {
+                document.getElementById('nextBtn').disabled = false;
+            } else {
+                document.getElementById('nextBtn').disabled = true;
+            }
+        }
+
+        // Next question
+        function nextQuestion() {
+            if (currentQuestion < totalQuestions) {
+                currentQuestion++;
+                updateQuestion();
+                updateProgress();
+            } else {
+                finishTest();
+            }
+        }
+
+        // Timer functionality
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    finishTest(true);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = display;
+
+            // Add warning classes
+            const timerEl = document.getElementById('timer');
+            timerEl.classList.remove('warning', 'danger');
+            if (timeRemaining <= 300) { // 5 minutes
+                timerEl.classList.add('danger');
+            } else if (timeRemaining <= 600) { // 10 minutes
+                timerEl.classList.add('warning');
+            }
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const progress = (currentQuestion / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        // Finish test
+        function finishTest(timeUp = false) {
+            clearInterval(timerInterval);
+            const answeredCount = Object.keys(answers).length;
+            const message = timeUp
+                ? `Time's up! You answered ${answeredCount} out of ${totalQuestions} questions.`
+                : `Test completed! You answered ${answeredCount} out of ${totalQuestions} questions.`;
+            
+            if (confirm(message + '\n\nWould you like to review your answers?')) {
+                // Could redirect to results page or show review
+                alert('Results page coming soon!');
+            }
+            
+            // For now, redirect to dashboard
+            // window.location.href = 'dashboard.html';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initTest);
+
+        // Warn before leaving page
+        window.addEventListener('beforeunload', function(e) {
+            if (timeRemaining > 0 && Object.keys(answers).length > 0) {
+                e.preventDefault();
+                e.returnValue = 'Are you sure you want to leave? Your progress will be lost.';
+            }
+        });
+    </script>
+</body>
+</html>
+
