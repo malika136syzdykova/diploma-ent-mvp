@@ -4,6 +4,7 @@ import (
 	"diploma-ent-mvp/internal/database"
 	"diploma-ent-mvp/internal/models"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -11,17 +12,17 @@ import (
 )
 
 type WrongQuestion struct {
-	QuestionID    uint     `json:"question_id"`
-	QuestionText  string   `json:"question_text"`
-	Options       []string `json:"options"`
-	CorrectAnswer string   `json:"correct_answer"`
-	Explanation   string   `json:"explanation"`
+	QuestionID   uint     `json:"question_id"`
+	QuestionText string   `json:"question_text"`
+	Options      []string `json:"options"`
+	CorrectAnswer string  `json:"correct_answer"`
+	Explanation  string   `json:"explanation"`
 }
 
 type ProgressResponse struct {
-	TotalQuestions int             `json:"total_questions"`
-	CorrectAnswers int             `json:"correct_answers"`
-	Percentage     float64         `json:"percentage"`
+	TotalQuestions int            `json:"total_questions"`
+	CorrectAnswers int            `json:"correct_answers"`
+	Percentage     float64        `json:"percentage"`
 	WrongQuestions []WrongQuestion `json:"wrong_questions"`
 }
 
@@ -33,11 +34,20 @@ func GetProgress(c *gin.Context) {
 		return
 	}
 
-	// Check if user exists
+	// Check if user exists, create if not
 	var user models.User
 	if err := database.DB.First(&user, uint(userID)).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
+		// User doesn't exist, create a new one with unique email
+		user = models.User{
+			ID:          uint(userID),
+			Name:        "User",
+			Email:       fmt.Sprintf("user%d@example.com", userID),
+			TargetScore: 0,
+		}
+		if err := database.DB.Create(&user).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+			return
+		}
 	}
 
 	// Get all attempts for user
@@ -66,11 +76,11 @@ func GetProgress(c *gin.Context) {
 				}
 
 				wrongQuestion := WrongQuestion{
-					QuestionID:    question.ID,
-					QuestionText:  question.QuestionText,
-					Options:       options,
+					QuestionID:   question.ID,
+					QuestionText: question.QuestionText,
+					Options:      options,
 					CorrectAnswer: question.CorrectAnswer,
-					Explanation:   question.Explanation,
+					Explanation:  question.Explanation,
 				}
 				wrongQuestions = append(wrongQuestions, wrongQuestion)
 			}

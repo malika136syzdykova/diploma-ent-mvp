@@ -1,18 +1,11 @@
 package database
 
 import (
-	"crypto/sha256"
 	"diploma-ent-mvp/internal/models"
-	"encoding/hex"
 	"encoding/json"
 	"log"
 	"os"
 )
-
-func hashPassword(password string) string {
-	sum := sha256.Sum256([]byte(password))
-	return hex.EncodeToString(sum[:])
-}
 
 type QuestionJSON struct {
 	Subject       string   `json:"subject"`
@@ -96,27 +89,15 @@ func SeedUsers() {
 	// Check if user already exists
 	var existingUser models.User
 	if err := DB.Where("email = ?", "nurkhan@example.com").First(&existingUser).Error; err == nil {
-		if existingUser.PasswordHash == "" {
-			existingUser.PasswordHash = hashPassword("123456")
-		}
-		if existingUser.Avatar == "" {
-			existingUser.Avatar = "https://api.dicebear.com/7.x/avataaars/svg?seed=Nurkhan"
-		}
-		if existingUser.TargetScore == 0 {
-			existingUser.TargetScore = 120
-		}
-		DB.Save(&existingUser)
 		log.Println("User Nurkhan already exists, skipping seed")
 		return
 	}
 
 	// Create user
 	user := models.User{
-		Name:         "Nurkhan",
-		Email:        "nurkhan@example.com",
-		PasswordHash: hashPassword("123456"),
-		Avatar:       "https://api.dicebear.com/7.x/avataaars/svg?seed=Nurkhan",
-		TargetScore:  120,
+		Name:        "Nurkhan",
+		Email:       "nurkhan@example.com",
+		TargetScore: 120,
 	}
 
 	if err := DB.Create(&user).Error; err != nil {

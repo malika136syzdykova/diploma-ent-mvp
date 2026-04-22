@@ -3,6 +3,7 @@ package handlers
 import (
 	"diploma-ent-mvp/internal/database"
 	"diploma-ent-mvp/internal/models"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -16,9 +17,9 @@ type AnswerRequest struct {
 }
 
 type AnswerResponse struct {
-	Correct       bool   `json:"correct"`
+	Correct      bool   `json:"correct"`
 	CorrectAnswer string `json:"correct_answer"`
-	Explanation   string `json:"explanation"`
+	Explanation  string `json:"explanation"`
 }
 
 func SubmitAnswer(c *gin.Context) {
@@ -28,11 +29,20 @@ func SubmitAnswer(c *gin.Context) {
 		return
 	}
 
-	// Check if user exists
+	// Check if user exists, create if not
 	var user models.User
 	if err := database.DB.First(&user, req.UserID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
+		// User doesn't exist, create a new one with unique email
+		user = models.User{
+			ID:          req.UserID,
+			Name:        "User",
+			Email:       fmt.Sprintf("user%d@example.com", req.UserID),
+			TargetScore: 0,
+		}
+		if err := database.DB.Create(&user).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+			return
+		}
 	}
 
 	// Get question
@@ -64,3 +74,4 @@ func SubmitAnswer(c *gin.Context) {
 		Explanation:   question.Explanation,
 	})
 }
+

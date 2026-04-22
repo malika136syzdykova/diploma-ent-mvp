@@ -169,6 +169,59 @@ function Progress() {
         </div>
       )}
 
+      {progress.wrong_questions && progress.wrong_questions.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">
+            Последние ошибки ({progress.wrong_questions.length})
+          </h2>
+          <div className="space-y-6">
+            {progress.wrong_questions.map((q, index) => (
+              <div key={index} className="ent-card p-6">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                    {q.question_text}
+                  </h3>
+                  <div className="space-y-2 mb-4">
+                    {q.options && q.options.length > 0 ? (
+                      q.options.map((option, optIndex) => (
+                        <div
+                          key={optIndex}
+                          className={`p-3 border-2 rounded-lg ${
+                            option === q.correct_answer
+                              ? 'border-violet-500 bg-violet-50'
+                              : 'border-slate-200 bg-slate-50'
+                          }`}
+                        >
+                          <div className="flex items-center">
+                            {option === q.correct_answer && (
+                              <span className="text-violet-600 mr-2 font-bold">✓</span>
+                            )}
+                            <span className="text-slate-700">{option}</span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-slate-500 text-sm">Варианты ответов не загружены</div>
+                    )}
+                  </div>
+                </div>
+                <div className="bg-violet-50 border border-violet-200 rounded-lg p-4 mb-4">
+                  <div className="text-sm font-medium text-violet-900 mb-1">
+                    Правильный ответ:
+                  </div>
+                  <div className="text-violet-800 font-semibold">{q.correct_answer}</div>
+                </div>
+                {q.explanation && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                    <div className="text-sm font-medium text-slate-700 mb-1">Объяснение:</div>
+                    <div className="text-slate-700">{q.explanation}</div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

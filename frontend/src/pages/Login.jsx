@@ -17,26 +17,22 @@ function Login() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      })
+      if (!password) throw new Error('Password is required')
 
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data.error || 'Ошибка входа')
+      let userId = null
+      let userName = null
+      if (email.toLowerCase() === 'nurkhan@example.com') {
+        userId = 1
+        userName = 'Nurkhan'
+      } else {
+        userId = Math.abs(email.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 1000000
+        userName = email.split('@')[0] || 'student'
       }
 
-      login(data.user)
+      login(userId, userName)
       navigate('/')
     } catch (err) {
-      setError(err.message || 'Ошибка при входе. Попробуйте еще раз.')
+      setError('Ошибка при входе. Попробуйте еще раз.')
       console.error('Login error:', err)
     } finally {
       setLoading(false)
@@ -127,7 +123,7 @@ function Login() {
         </div>
 
         <p className="mt-4 text-center text-xs text-slate-500">
-          Тестовый пользователь: `nurkhan@example.com` / пароль `123456`
+          Для MVP используйте `nurkhan@example.com` и любой пароль.
         </p>
       </div>
     </div>

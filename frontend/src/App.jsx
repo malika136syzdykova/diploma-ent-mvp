@@ -10,7 +10,6 @@ import Prediction from './pages/Prediction'
 import Layout from './components/Layout'
 import AIChat from './pages/AIChat'
 import About from './pages/About'
-import Profile from './pages/Profile'
 
 function App() {
   return (
@@ -27,7 +26,6 @@ function App() {
             <Route path="/progress" element={<Progress />} />
             <Route path="/prediction" element={<Prediction />} />
             <Route path="/about" element={<About />} />
-            <Route path="/profile" element={<Profile />} />
           </Routes>
         </Layout>
       </Router>

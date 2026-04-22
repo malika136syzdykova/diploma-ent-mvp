@@ -3,55 +3,37 @@ import { createContext, useContext, useState, useEffect } from 'react'
 const UserContext = createContext()
 
 export function UserProvider({ children }) {
-  const [user, setUser] = useState(null)
+  const [userId, setUserId] = useState(null)
+  const [userName, setUserName] = useState(null)
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user')
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser))
-      } catch (e) {
-        localStorage.removeItem('user')
-      }
+    // Загрузить user_id из localStorage при загрузке
+    const savedUserId = localStorage.getItem('user_id')
+    const savedUserName = localStorage.getItem('user_name')
+    if (savedUserId) {
+      setUserId(parseInt(savedUserId))
+    }
+    if (savedUserName) {
+      setUserName(savedUserName)
     }
   }, [])
 
-  const login = (userData) => {
-    setUser(userData)
-    localStorage.setItem('user', JSON.stringify(userData))
-  }
-
-  const refreshUser = async () => {
-    if (!user?.id) return
-    try {
-      const response = await fetch(`/api/users/${user.id}`)
-      if (!response.ok) return
-      const data = await response.json()
-      login(data.user)
-    } catch (e) {
-      console.error('Failed to refresh user', e)
-    }
+  const login = (id, name) => {
+    setUserId(id)
+    setUserName(name)
+    localStorage.setItem('user_id', id.toString())
+    localStorage.setItem('user_name', name)
   }
 
   const logout = () => {
-    setUser(null)
-    localStorage.removeItem('user')
+    setUserId(null)
+    setUserName(null)
+    localStorage.removeItem('user_id')
+    localStorage.removeItem('user_name')
   }
 
   return (
-    <UserContext.Provider
-      value={{
-        user,
-        userId: user?.id || null,
-        userName: user?.name || null,
-        userEmail: user?.email || null,
-        userAvatar: user?.avatar || '',
-        targetScore: user?.target_score || 0,
-        login,
-        refreshUser,
-        logout,
-      }}
-    >
+    <UserContext.Provider value={{ userId, userName, login, logout }}>
       {children}
     </UserContext.Provider>
   )

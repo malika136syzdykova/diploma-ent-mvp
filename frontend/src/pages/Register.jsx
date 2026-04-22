@@ -5,9 +5,6 @@ import { useUser } from '../context/UserContext'
 function Register() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [targetScore, setTargetScore] = useState(100)
-  const [avatar, setAvatar] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const navigate = useNavigate()
@@ -19,27 +16,25 @@ function Register() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          avatar,
-          target_score: Number(targetScore),
-        }),
-      })
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data.error || 'Ошибка регистрации')
-      }
-      login(data.user)
+      // Для MVP: создаем пользователя через простой API или используем существующего
+      // Поскольку backend не имеет API регистрации, создадим простую логику
+      // В реальном приложении здесь был бы POST /api/users
+      
+      // Проверяем, существует ли пользователь с таким email
+      // Для MVP просто создаем нового пользователя локально
+      // В реальности нужен backend endpoint POST /api/users
+      
+      // Временное решение: генерируем ID и сохраняем в localStorage
+      // В реальном приложении это должно быть через API
+      const newUserId = Date.now() % 1000000 // Простой способ получить уникальный ID
+      
+      // Сохраняем пользователя
+      login(newUserId, name)
+      
+      // Перенаправляем на главную
       navigate('/')
     } catch (err) {
-      setError(err.message || 'Ошибка при регистрации. Попробуйте еще раз.')
+      setError('Ошибка при регистрации. Попробуйте еще раз.')
       console.error('Registration error:', err)
     } finally {
       setLoading(false)
@@ -88,51 +83,6 @@ function Register() {
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="example@email.com"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Пароль
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Не менее 6 символов"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="avatar" className="block text-sm font-medium text-gray-700 mb-2">
-              Ссылка на аватар (опционально)
-            </label>
-            <input
-              type="url"
-              id="avatar"
-              value={avatar}
-              onChange={(e) => setAvatar(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="https://..."
-            />
-          </div>
-
-          <div>
-            <label htmlFor="targetScore" className="block text-sm font-medium text-gray-700 mb-2">
-              Целевой балл ЕНТ
-            </label>
-            <input
-              type="number"
-              id="targetScore"
-              value={targetScore}
-              onChange={(e) => setTargetScore(e.target.value)}
-              min={1}
-              max={140}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 

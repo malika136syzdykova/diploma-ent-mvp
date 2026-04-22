@@ -3,7 +3,7 @@ import { useUser } from '../context/UserContext'
 import { useState } from 'react'
 
 function Layout({ children }) {
-  const { userId, userName, userEmail, userAvatar, logout } = useUser()
+  const { userId, userName, logout } = useUser()
   const [chatOpen, setChatOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -46,26 +46,17 @@ function Layout({ children }) {
                 <>
                   <button
                     onClick={() => setMenuOpen((v) => !v)}
-                    className="h-10 w-10 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold overflow-hidden"
+                    className="h-10 w-10 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold"
                     title="Профиль"
                   >
-                    {userAvatar ? (
-                      <img src={userAvatar} alt="avatar" className="h-full w-full object-cover" />
-                    ) : (
-                      (userName || 'U').slice(0, 1).toUpperCase()
-                    )}
+                    {(userName || 'U').slice(0, 1).toUpperCase()}
                   </button>
                   {menuOpen && (
                     <div className="absolute top-12 right-0 w-60 ent-card p-3 z-40">
                       <p className="font-semibold text-slate-900">{userName || `ID: ${userId}`}</p>
-                      <p className="text-xs text-slate-500 mb-3">{userEmail || 'email не указан'}</p>
-                      <Link
-                        to="/profile"
-                        className="block text-sm py-2 px-2 rounded-lg hover:bg-violet-50 text-slate-700"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        Профиль
-                      </Link>
+                      <p className="text-xs text-slate-500 mb-3">
+                        {userName ? `${userName.toLowerCase()}@ent-ai.kz` : `user${userId}@ent-ai.kz`}
+                      </p>
                       <Link
                         to="/progress"
                         className="block text-sm py-2 px-2 rounded-lg hover:bg-violet-50 text-slate-700"
